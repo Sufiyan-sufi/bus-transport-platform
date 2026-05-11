@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  CONTRACTOR
+  EMPLOYEE
+}
+
+enum RouteStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  role          Role      @default(EMPLOYEE)
+  contractor    ContractorProfile?
+  bookings      Booking[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model ContractorProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  companyName String
+  phone       String
+  details     String?
+  routes      Route[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Route {
+  id           String      @id @default(cuid())
+  name         String
+  contractorId String
+  contractor   ContractorProfile @relation(fields: [contractorId], references: [id])
+  capacity     Int
+  status       RouteStatus @default(ACTIVE)
+  stops        Stop[]
+  pricing      Pricing[]
+  schedules    Schedule[]
+  bookings     Booking[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Stop {
+  id         String   @id @default(cuid())
+  routeId    String
+  route      Route    @relation(fields: [routeId], references: [id])
+  name       String
+  location   String?
+  orderIndex Int
+  fromPrices Pricing[] @relation("FromStop")
+  toPrices   Pricing[] @relation("ToStop")
+  fromBookings Booking[] @relation("FromBookingStop")
+  toBookings   Booking[] @relation("ToBookingStop")
+}
+
+model Pricing {
+  id         String   @id @default(cuid())
+  routeId    String
+  route      Route    @relation(fields: [routeId], references: [id])
+  fromStopId String
+  fromStop   Stop     @relation("FromStop", fields: [fromStopId], references: [id])
+  toStopId   String
+  toStop     Stop     @relation("ToStop", fields: [toStopId], references: [id])
+  amount     Decimal  @db.Decimal(10, 2)
+}
+
+model Schedule {
+  id            String   @id @default(cuid())
+  routeId       String
+  route         Route    @relation(fields: [routeId], references: [id])
+  departureTime String
+  frequency     String   @default("Daily")
+}
+
+model Booking {
+  id         String        @id @default(cuid())
+  employeeId String
+  employee   User          @relation(fields: [employeeId], references: [id])
+  routeId    String
+  route      Route         @relation(fields: [routeId], references: [id])
+  fromStopId String
+  fromStop   Stop          @relation("FromBookingStop", fields: [fromStopId], references: [id])
+  toStopId   String
+  toStop     Stop          @relation("ToBookingStop", fields: [toStopId], references: [id])
+  startDate  DateTime
+  status     BookingStatus @default(PENDING)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+}
