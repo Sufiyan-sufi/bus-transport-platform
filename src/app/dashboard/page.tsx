@@ -38,8 +38,8 @@ export default async function DashboardPage() {
     if (!contractorProfile) redirect("/auth/signup/contractor");
 
     const allBookings = contractorProfile.routes.flatMap((r: any) => r.bookings as any[]);
-    const pendingCount = allBookings.filter((b) => b.status === "PENDING").length;
-    const confirmedCount = allBookings.filter((b) => b.status === "CONFIRMED").length;
+    const pendingCount = allBookings.filter((b: any) => b.status === "PENDING").length;
+    const confirmedCount = allBookings.filter((b: any) => b.status === "CONFIRMED").length;
 
     return (
       <div className="min-h-screen">
