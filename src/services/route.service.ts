@@ -38,6 +38,7 @@ export class RouteService {
     const routes = await prisma.route.findMany({
       where: {
         status: "ACTIVE",
+        contractor: { subscriptionStatus: { not: "INACTIVE" } },
         AND: [
           { stops: { some: { name: from } } },
           { stops: { some: { name: to } } },
@@ -53,10 +54,29 @@ export class RouteService {
     });
 
     // Filter routes where 'from' stop has a lower orderIndex than 'to' stop
-    return routes.filter((route: any) => {
+    const filtered = routes.filter((route: any) => {
       const fromStop = route.stops.find((s: any) => s.name === from);
       const toStop = route.stops.find((s: any) => s.name === to);
       return fromStop && toStop && fromStop.orderIndex < toStop.orderIndex;
     });
+
+    // Add seatsRemaining: capacity minus today's active bookings
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    return Promise.all(
+      filtered.map(async (route: any) => {
+        const booked = await prisma.booking.count({
+          where: {
+            routeId: route.id,
+            status: { in: ["PENDING", "CONFIRMED"] },
+            startDate: { gte: today, lt: tomorrow },
+          },
+        });
+        return { ...route, seatsRemaining: Math.max(0, route.capacity - booked) };
+      })
+    );
   }
 }

@@ -2,6 +2,8 @@ import { BookingRepository } from "@/repositories/booking.repository";
 import { RouteRepository } from "@/repositories/route.repository";
 import { bookingSchema } from "@/validators";
 import { z } from "zod";
+import { prisma } from "@/lib/prisma";
+import { sendBookingConfirmation } from "@/lib/email";
 
 export class BookingService {
   static async createBooking(
@@ -27,13 +29,30 @@ export class BookingService {
     }
 
     // 3. Create booking
-    return await BookingRepository.create({
+    const booking = await BookingRepository.create({
       employeeId,
       routeId: validatedData.routeId,
       fromStopId: validatedData.fromStopId,
       toStopId: validatedData.toStopId,
       startDate: validatedData.startDate,
     });
+
+    // 4. Send confirmation email (fire-and-forget)
+    prisma.user.findUnique({ where: { id: employeeId }, select: { email: true } })
+      .then((user) => {
+        if (user?.email) {
+          sendBookingConfirmation(user.email, {
+            id: booking.id,
+            routeName: booking.route.name,
+            fromStop: booking.fromStop.name,
+            toStop: booking.toStop.name,
+            startDate: booking.startDate,
+          }).catch(console.error);
+        }
+      })
+      .catch(console.error);
+
+    return booking;
   }
 
   static async getEmployeeBookings(employeeId: string) {

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { BookingList } from "@/components/features/dashboard/BookingList";
+import { SubscriptionBanner } from "@/components/features/dashboard/SubscriptionBanner";
 import { Bus, Calendar, Users, ArrowRight, MapPin, Plus, TrendingUp, Clock } from "lucide-react";
 
 export default async function DashboardPage() {
@@ -56,6 +57,9 @@ export default async function DashboardPage() {
               </div>
               <Button asChild className="bg-gradient-to-r from-sky-500 to-blue-600 border-0 shadow-lg shadow-sky-500/25 gap-2 self-start md:self-auto">
                 <Link href="/dashboard/routes/new"><Plus className="w-4 h-4" />Add New Route</Link>
+              </Button>
+              <Button asChild variant="outline" className="border-white/10 hover:bg-white/5 gap-2 self-start md:self-auto">
+                <Link href="/dashboard/fleet"><Bus className="w-4 h-4" />Fleet</Link>
               </Button>
             </div>
           </div>
@@ -114,6 +118,9 @@ export default async function DashboardPage() {
               </div>
             ))}
           </div>
+
+          {/* Subscription Banner */}
+          <SubscriptionBanner initialStatus={contractorProfile.subscriptionStatus} />
 
           {/* Bookings */}
           <div className="space-y-4">

@@ -45,5 +45,5 @@ export const bookingSchema = z.object({
   routeId: z.string(),
   fromStopId: z.string(),
   toStopId: z.string(),
-  startDate: z.date(),
+  startDate: z.coerce.date(),
 });

@@ -67,8 +67,8 @@
 
 - [X] T024 [P] Implement responsive navigation and mobile sidebar in `src/components/shared/Navbar.tsx`
 - [X] T025 Write unit tests for `RouteService` search and pricing logic using Vitest
-- [ ] T026 Write E2E test for the "Happy Path" (Search -> Book -> Confirm) using Playwright
-- [ ] T027 Setup environment variables for production and verify build command (`npm run build`)
+- [X] T026 Write E2E test for the "Happy Path" (Search -> Book -> Confirm) using Playwright
+- [X] T027 Setup environment variables for production and verify build command (`npm run build`)
 
 ---
 
@@ -79,3 +79,27 @@
 - **Phase 4** depends on Phase 3 (Need routes to search).
 - **Phase 5** depends on Phase 4 (Need bookings to manage).
 - **Phase 6** runs after core features are functional.
+
+---
+
+## Phase 7: Docx Gap Features
+
+**Purpose**: Implement features present in the original product docx but missing from the current build.
+
+- [X] T028 Add `seatsRemaining` to `RouteService.searchRoutes` (capacity minus PENDING+CONFIRMED bookings for today) and display it on search result cards in `src/components/features/search/RouteSearch.tsx`
+- [X] T029 Add no-results fallback UI to search results: when routes=[], query `/api/stops` and show a list of available stops as suggestions in `src/components/features/search/RouteSearch.tsx`
+- [X] T030 Add "How It Works" section to `src/app/page.tsx`: two-column layout — 3-step employee flow (left) + contractor CTA with "List your buses" button (right)
+- [X] T031 Add booking confirmation email: install `resend`, create `src/lib/email.ts`, call `sendBookingConfirmation(email, booking)` inside `BookingService.createBooking` after DB write. Add `RESEND_API_KEY` to `.env`.
+- [X] T032 Add `Bus` model to `prisma/schema.prisma` (type: MINI|COACH|STANDARD, capacity, photoUrl?, contractorId FK). Add `/dashboard/fleet` page with list + add-bus form. Add optional `busId` FK on `Route`.
+- [X] T033 Add `subscriptionStatus` (TRIAL|ACTIVE|INACTIVE) to `ContractorProfile` in schema. Exclude INACTIVE contractors from `RouteService.searchRoutes`. Add subscription banner to `/dashboard` and a mock "Activate Subscription" button that sets status to ACTIVE via `PATCH /api/contractor/subscription`.
+
+---
+
+### Phase 7 Implementation Order
+
+1. **T028** — Pure backend + UI change, no schema migration. Start here.
+2. **T029** — Frontend only, no backend changes.
+3. **T030** — Frontend only, homepage edit.
+4. **T031** — New lib + env var. Requires `RESEND_API_KEY`.
+5. **T032** — Schema migration → new page. Run `prisma migrate dev` after schema change.
+6. **T033** — Schema migration → API + UI. Depends on T032 migration being applied first.

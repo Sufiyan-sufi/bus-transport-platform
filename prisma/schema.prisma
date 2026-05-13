@@ -3,7 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -23,6 +25,18 @@ enum BookingStatus {
   CANCELLED
 }
 
+enum BusType {
+  MINI
+  STANDARD
+  COACH
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  INACTIVE
+}
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -35,15 +49,30 @@ model User {
 }
 
 model ContractorProfile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id])
-  companyName String
-  phone       String
-  details     String?
-  routes      Route[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                 String             @id @default(cuid())
+  userId             String             @unique
+  user               User               @relation(fields: [userId], references: [id])
+  companyName        String
+  phone              String
+  details            String?
+  subscriptionStatus SubscriptionStatus @default(TRIAL)
+  routes             Route[]
+  buses              Bus[]
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+}
+
+model Bus {
+  id           String            @id @default(cuid())
+  contractorId String
+  contractor   ContractorProfile @relation(fields: [contractorId], references: [id])
+  type         BusType           @default(STANDARD)
+  capacity     Int
+  plateNumber  String?
+  photoUrl     String?
+  routes       Route[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 }
 
 model Route {
@@ -51,6 +80,8 @@ model Route {
   name         String
   contractorId String
   contractor   ContractorProfile @relation(fields: [contractorId], references: [id])
+  busId        String?
+  bus          Bus?        @relation(fields: [busId], references: [id])
   capacity     Int
   status       RouteStatus @default(ACTIVE)
   stops        Stop[]

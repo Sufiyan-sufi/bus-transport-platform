@@ -1,14 +1,10 @@
-# Resume Point: May 12, 2026
+# Resume Point: May 13, 2026
 
 ## 🎯 Current Status
-The project is in **Phase 6: Polish & Testing**. The core functionality (Search, Booking, Contractor Dashboard) is implemented. We have successfully navigated a major technical hurdle regarding **Next.js 16 (Turbopack)** and **Prisma 7** compatibility.
+The project is in **Phase 6: Polish & Testing**. Core functionality is complete. E2E testing infrastructure is now in place.
 
-## ✅ Completed Today
-- **Responsive Navbar (T024):** Implemented a role-aware navigation bar for both Employees and Contractors.
-- **Unit Testing (T025):** Added 8 passing tests for `RouteService` and `PricingService` logic.
-- **Next.js 15/16 Migration:** Updated all dynamic route handlers (`params`) to be `Promise`-based as required by the latest Next.js version.
-- **Prisma-Turbopack Resolution:** Fixed the "Unexpected token <" and "client engine" errors by configuring `serverExternalPackages` in `next.config.ts`.
-- **Auth Re-enabled:** Re-connected the `PrismaAdapter` in `src/lib/auth.ts`.
+## ✅ Completed Today (May 12)
+- **T026 (E2E Testing):** Installed Playwright (`@playwright/test@1.52.0`), created `playwright.config.ts`, and wrote the Happy Path E2E test (`e2e/happy-path.spec.ts`) covering: Login → Search → Route Detail → Book → Success Confirmation.
 
 ## 🛠 Working Environment
 - **Node.js:** v22.21.1
@@ -16,12 +12,13 @@ The project is in **Phase 6: Polish & Testing**. The core functionality (Search,
 - **Prisma:** 7.8.0
 - **Database:** Supabase (PostgreSQL)
 
-## ⏭ Tomorrow's Starting Point
-1. **Verification:** Start the dev server (`npm run dev`) and confirm the home page and login pages load without JSON errors.
-2. **T026 (E2E Testing):** Initialize Playwright and write the "Happy Path" test (Search -> Book -> Confirm).
-3. **T027 (Production Build):** Run a final `npm run build` to verify all dynamic segments are correctly identified and typed.
-4. **API Cleanup:** Remove the diagnostic `src/app/api/test/route.ts`.
+## ⏭ Starting Point (May 13, 8 PM)
+1. **Run E2E Test:** Start dev server (`npm run dev`), then run `TEST_EMPLOYEE_EMAIL=your@email.com TEST_EMPLOYEE_PASSWORD=yourpass npm run test:e2e`. Fix any selector issues if the test fails.
+2. **API Cleanup (T026 leftover):** Delete the diagnostic file `src/app/api/test/route.ts`.
+3. **T027 (Production Build):** Run `npm run build` to verify all dynamic segments are correctly typed. Clear `.next` folder first if needed.
+4. **Final Review:** Check all pages load correctly in production build.
 
 ## 📌 Critical Notes
-- If the `PrismaClientConstructorValidationError` returns, ensure `next.config.ts` still contains `@prisma/client` in `serverExternalPackages`.
-- Always clear the `.next` folder if switching between `dev` and `build` after major config changes.
+- E2E test requires a seeded EMPLOYEE account — set `TEST_EMPLOYEE_EMAIL` and `TEST_EMPLOYEE_PASSWORD` env vars.
+- If `PrismaClientConstructorValidationError` appears, verify `next.config.ts` still has `@prisma/client` in `serverExternalPackages`.
+- Always clear `.next` folder when switching between dev/build after major config changes.

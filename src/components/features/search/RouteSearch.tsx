@@ -11,6 +11,7 @@ interface Route {
   id: string;
   name: string;
   capacity: number;
+  seatsRemaining: number;
   stops: { name: string; orderIndex: number }[];
   pricing: { fromStopId: string; toStopId: string; amount: string }[];
   contractor: { companyName: string };
@@ -137,14 +138,31 @@ export function RouteSearch() {
           </div>
 
           {results.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center space-y-4 gradient-border rounded-3xl bg-card">
-              <div className="p-5 glass rounded-2xl border border-white/10">
-                <Bus className="w-10 h-10 text-muted-foreground" />
+            <div className="gradient-border rounded-3xl bg-card overflow-hidden">
+              <div className="flex flex-col items-center justify-center py-12 text-center space-y-4 px-8">
+                <div className="p-5 glass rounded-2xl border border-white/10">
+                  <Bus className="w-10 h-10 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="font-semibold text-lg">No routes available</p>
+                  <p className="text-muted-foreground text-sm mt-1">No buses run between these stops. Try one of the available stops below.</p>
+                </div>
               </div>
-              <div>
-                <p className="font-semibold text-lg">No routes available</p>
-                <p className="text-muted-foreground text-sm mt-1">Try different pickup or drop-off points</p>
-              </div>
+              {stops.length > 0 && (
+                <div className="border-t border-white/5 px-8 py-6">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <MapPin className="w-3.5 h-3.5" /> Available stops
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {stops.map((s) => (
+                      <span key={s.name} className="flex items-center gap-1.5 text-sm glass border border-white/10 px-3 py-1.5 rounded-full text-muted-foreground hover:text-foreground hover:border-sky-500/30 transition-colors cursor-default">
+                        <MapPin className="w-3 h-3 text-sky-400 shrink-0" />
+                        {s.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -177,7 +195,9 @@ export function RouteSearch() {
                     <div className="flex items-center justify-between text-sm text-muted-foreground pt-1 border-t border-white/5">
                       <div className="flex items-center gap-1.5">
                         <Users className="w-3.5 h-3.5" />
-                        <span>{route.capacity} seats</span>
+                        <span className={route.seatsRemaining === 0 ? "text-red-400 font-semibold" : route.seatsRemaining <= 5 ? "text-amber-400 font-semibold" : ""}>
+                          {route.seatsRemaining === 0 ? "Full" : `${route.seatsRemaining} seats left`}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Building2 className="w-3.5 h-3.5" />
@@ -185,10 +205,12 @@ export function RouteSearch() {
                       </div>
                     </div>
 
-                    <Button asChild className="w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 border-0 rounded-xl gap-2 shadow-lg shadow-sky-500/20 group-hover:shadow-sky-500/30 transition-all">
-                      <Link href={`/routes/${route.id}?from=${fromStop}&to=${toStop}`}>
-                        Book Now <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                      </Link>
+                    <Button asChild={route.seatsRemaining > 0} disabled={route.seatsRemaining === 0} className="w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 border-0 rounded-xl gap-2 shadow-lg shadow-sky-500/20 group-hover:shadow-sky-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                      {route.seatsRemaining > 0 ? (
+                        <Link href={`/routes/${route.id}?from=${fromStop}&to=${toStop}`}>
+                          Book Now <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                        </Link>
+                      ) : <span>Fully Booked</span>}
                     </Button>
                   </div>
                 </div>

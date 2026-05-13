@@ -87,6 +87,70 @@ export default function Home() {
         <RouteSearch />
       </section>
 
+      {/* How It Works Section */}
+      <section className="container mx-auto px-4 py-20 border-t border-white/5">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-black mb-4">How It <span className="gradient-text">Works</span></h2>
+          <p className="text-muted-foreground text-lg max-w-xl mx-auto">Get moving in minutes — whether you're an employee or a transport provider</p>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
+          {/* Employee flow */}
+          <div className="space-y-6">
+            <h3 className="text-xl font-bold flex items-center gap-2"><Users className="w-5 h-5 text-sky-400" /> For Employees</h3>
+            <div className="space-y-4">
+              {[
+                { step: "1", title: "Search Your Route", desc: "Pick your pickup and drop-off stop to see available buses and seat availability." },
+                { step: "2", title: "Book a Seat", desc: "Choose a route, select your start date, and confirm your booking in one click." },
+                { step: "3", title: "Ride & Track", desc: "Get confirmation, wait for contractor approval, and enjoy your daily commute." },
+              ].map((item) => (
+                <div key={item.step} className="flex gap-4 glass border border-white/5 rounded-2xl p-5">
+                  <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center font-black text-white text-sm shadow-lg shadow-sky-500/25">
+                    {item.step}
+                  </div>
+                  <div>
+                    <p className="font-semibold">{item.title}</p>
+                    <p className="text-sm text-muted-foreground mt-0.5">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Contractor CTA */}
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-500/15 via-card to-sky-500/10 border border-white/10 p-8 space-y-6">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10 space-y-6">
+              <div className="p-3 glass rounded-2xl w-fit border border-white/10">
+                <Bus className="w-8 h-8 text-violet-400" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-black">List Your Buses</h3>
+                <p className="text-muted-foreground mt-2 leading-relaxed">
+                  Are you a transport company? Join our platform, create routes, set your pricing, and start accepting bookings from corporate employees today.
+                </p>
+              </div>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                {["Create routes with custom stops", "Set stop-to-stop pricing", "Manage bookings from your dashboard"].map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-violet-400 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/auth/signup/contractor"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-400 hover:to-purple-500 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-violet-500/25 transition-all hover:scale-105"
+              >
+                <Bus className="w-4 h-4" />
+                List Your Buses
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="container mx-auto px-4 py-20 border-t border-white/5">
         <div className="text-center mb-16">
