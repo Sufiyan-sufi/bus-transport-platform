@@ -47,28 +47,19 @@ test.describe("Happy Path: Search → Book → Confirm", () => {
     // ── Step 2: Scroll to search section and pick stops ──────────────────────
     await page.locator("#search").scrollIntoViewIfNeeded();
 
-    // Select "From" stop — pick the first available option
-    const fromTrigger = page.getByRole("combobox").first();
-    await fromTrigger.click();
-    const firstFromOption = page.getByRole("option").first();
-    const fromStopName = await firstFromOption.textContent();
-    await firstFromOption.click();
+    // Select "From" stop - use text content to select "dubai 1"
+    await page.getByRole("combobox").first().click();
+    await page.getByRole("option", { name: /dubai 1/i }).click();
 
-    // Select "To" stop — pick the second available option (first non-disabled)
-    const toTrigger = page.getByRole("combobox").nth(1);
-    await toTrigger.click();
-    const firstToOption = page
-      .getByRole("option")
-      .filter({ hasNot: page.locator('[aria-disabled="true"]') })
-      .first();
-    const toStopName = await firstToOption.textContent();
-    await firstToOption.click();
+    // Select "To" stop - use text content to select "dubai 3"
+    await page.getByRole("combobox").nth(1).click();
+    await page.getByRole("option", { name: /dubai 3/i }).click();
 
     // ── Step 3: Click Search ─────────────────────────────────────────────────
     await page.getByRole("button", { name: /^search$/i }).click();
 
-    // Wait for results
-    await expect(page.getByText(/route.*found|no routes/i)).toBeVisible({
+    // Wait for results - should find routes
+    await expect(page.getByText(/\d+ route.*found/i)).toBeVisible({
       timeout: 10_000,
     });
 
@@ -78,7 +69,7 @@ test.describe("Happy Path: Search → Book → Confirm", () => {
     await bookNowLink.click();
 
     // ── Step 5: Route detail page — click "Proceed to Booking" ───────────────
-    await page.waitForURL(/\/routes\/.+\?from=/, { timeout: 10_000 });
+    await page.waitForURL(/\/routes\/.+\?from=dubai/, { timeout: 10_000 });
     const proceedBtn = page.getByRole("link", { name: /proceed to booking/i });
     await expect(proceedBtn).toBeVisible({ timeout: 8_000 });
     await proceedBtn.click();

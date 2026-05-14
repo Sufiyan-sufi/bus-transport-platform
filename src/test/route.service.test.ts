@@ -8,6 +8,9 @@ vi.mock('@/lib/prisma', () => ({
     route: {
       findMany: vi.fn(),
     },
+    booking: {
+      count: vi.fn(),
+    },
   },
 }));
 
@@ -22,6 +25,7 @@ describe('RouteService.searchRoutes', () => {
         id: 'route-1',
         name: 'Route 1',
         status: 'ACTIVE',
+        capacity: 50,
         stops: [
           { name: 'Stop A', orderIndex: 0 },
           { name: 'Stop B', orderIndex: 1 },
@@ -31,11 +35,13 @@ describe('RouteService.searchRoutes', () => {
     ];
 
     (prisma.route.findMany as any).mockResolvedValue(mockRoutes);
+    (prisma.booking.count as any).mockResolvedValue(10);
 
     const result = await RouteService.searchRoutes('Stop A', 'Stop C');
-    
+
     expect(result).toHaveLength(1);
     expect(result[0].id).toBe('route-1');
+    expect(result[0].seatsRemaining).toBe(40);
   });
 
   it('should filter out routes where from stop is after to stop', async () => {
